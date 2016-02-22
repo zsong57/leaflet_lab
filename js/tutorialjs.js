@@ -1,5 +1,10 @@
 /*Part1 Example from Leaflet Quick Start Guide*/
 //  initialize the map and set its view to our chosen geographical coordinates and a zoom level
+<<<<<<< HEAD
+
+
+
+=======
 var map = L.map('map').setView([51.505, 20], 3);
 // add base map with tile layers from website
 L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
@@ -11,6 +16,7 @@ L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{
 }).addTo(map);
 
 
+>>>>>>> origin/master
 // add a marker to a certain location
 var marker = L.marker([51.5, -0.09]).addTo(map);
 
