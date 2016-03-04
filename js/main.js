@@ -1,16 +1,32 @@
-var map = L.map('map').setView([14, 195], 3);
-// add base map with tile layers from website
-L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
+var black   = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
 	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 	subdomains: 'abcd', // I chose one of stamen design style
 	minZoom: 2,
 	maxZoom: 5, // set minimum and maximum scale zooms
 	ext: 'png'
-}).addTo(map);
+}),
 
-	function calcPropRadius(attValue) {
+terrain = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}', {
+	type: 'sat',
+	ext: 'jpg',
+	minZoom: 2,
+	maxZoom: 5,
+	attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency',
+	subdomains: '1234'
+});
+
+getOverlaydata(map);
+
+var map = L.map('map', {
+    center: [25, 195],
+    zoom: 3,
+    layers: [black]
+});
+
+
+function calcPropRadius(attValue) {
     //scale factor to adjust symbol size evenly
-    var scaleFactor = 50;
+    var scaleFactor = 40;
     //area based on attribute value and scale factor
     var area = attValue * scaleFactor;
     //radius calculated based on area
@@ -24,13 +40,11 @@ function createPropSymbols(data,map,attributes){
 	//Step 4: Determine which attribute to visualize with proportional symbols
     var attribute = attributes[0];
 	//create marker options
-	console.log(attribute);
+	
     var Options = {
-        radius: 8,
+     
         fillColor: "red",
         color: "red",
-        weight: 1,
-        opacity: 1,
         fillOpacity: 0.9,
     };
 	
@@ -49,13 +63,10 @@ function createPropSymbols(data,map,attributes){
 			
 			
 	 //original popupContent changed to panelContent
-    var panelContent = "<p><b>Location:</b> " + feature.properties.Location + "</p>";
-	//add formatted attribute to panel content string
-    var year = attribute.split("_")[1];
+    var panelContent = "<p><b>Location:</b><span class = 'LocationName'>" + feature.properties.Location + "</span></p>";  
 	// add extra information
-    panelContent += "<p><b>Time period: </b>" + attribute + "</p><p><b>Earthquake number: </b> " + feature.properties[attribute] + "</p>";
+    panelContent += "<p><b>Time period: </b>" + attribute + "</p><p><b>Number of earthquakes: </b> " + feature.properties[attribute] + "</p>";
 	
-
     //popup content is now just the city name
     var popupContent = feature.properties.Location;
 	
@@ -65,14 +76,17 @@ function createPropSymbols(data,map,attributes){
 		closeButton: false
     });
             			 
-
     //event listeners to open popup on hover
     layer.on({
         mouseover: function(){
             this.openPopup();
+			this.setStyle({fillColor: "gray"});
+			this.setStyle({color: "gray"});
         },
         mouseout: function(){
             this.closePopup();
+			this.setStyle({fillColor: "red"});
+			this.setStyle({color: "red"});
         },
 		 click: function(){
             $("#paneltext").html(panelContent);
@@ -81,7 +95,7 @@ function createPropSymbols(data,map,attributes){
 						
     //create circle markers
 return layer;	
-return pointToLayer(feature, latlng, attributes);		
+		
         }
     }).addTo(map);
 
@@ -121,15 +135,83 @@ function getCircleValues(map, attribute){
 	};
 };
 
+function createLegend(map, attributes){
+	var LegendControl = L.Control.extend({
+		options: {
+			position: 'bottomright'
+		},
+
+		onAdd: function (map) {
+			// create the control container with a particular class name
+			var container = L.DomUtil.create('div', 'legend-control-container');
+
+			//add temporal legend div to container
+			$(container).append('<div id="temporal-legend">')
+
+			//start attribute legend svg string
+			var svg = '<svg id="attribute-legend" width="300px" height="260px">';
+
+			//array to base loop on
+			var circles = {
+				max: 60,
+				mean: 140,
+				min: 220
+			};
+
+			//loop to add each circle and text to svg string
+			for (var circle in circles){
+				//circle string
+				svg += '<circle class="legend-circle" id="' + circle + '" fill="red" fill-opacity="0.3"  cx="180"/>';
+
+				//text string
+				svg += '<text id="' + circle + '-text" x="20" y="' + circles[circle] + '"></text>';
+			};
+
+			//close svg string
+			svg += "</svg>";
+
+			//add attribute legend svg to container
+			$(container).append(svg);
+
+			return container;
+		}
+	});
+
+	map.addControl(new LegendControl());
+
+	updateLegend(map, attributes[0]);
+};
+
+
+
 //Create new sequence controls
 function createSequenceControls(map, attributes){
-    //create range input element (slider)
-    $('#paneltime').append('<input class="range-slider" type="range">');
-	$('#paneltime').append('<button class="skip" id="reverse">Reverse</button>');
-    $('#paneltime').append('<button class="skip" id="forward">Skip</button>');
-	//replace button content with images
-	$('#reverse').html('<img src="img/reverse.png">');
-    $('#forward').html('<img src="img/forward.png">');
+	var SequenceControl = L.Control.extend({
+		options: {
+			position: 'bottomleft'
+		},
+
+		onAdd: function (map) {
+			// create the control container with a particular class name
+			var container = L.DomUtil.create('div', 'sequence-control-container');
+
+			//create range input element (slider)
+			$(container).append('<input class="range-slider" type="range">');
+
+			//add skip buttons
+			$(container).append('<button class="skip" id="reverse" title="Reverse">Reverse</button>');
+			$(container).append('<button class="skip" id="forward" title="Forward">Skip</button>');
+
+			//kill any mouse event listeners on the map
+			$(container).on('mousedown dblclick', function(e){
+				L.DomEvent.stopPropagation(e);
+			});
+
+			return container;
+		}
+	});
+
+map.addControl(new SequenceControl());
 	
 	//set slider attributes
     $('.range-slider').attr({
@@ -139,6 +221,9 @@ function createSequenceControls(map, attributes){
         step: 1
     });
 	
+	//replace button content with images
+$('#reverse').html('<img src="img/reverse.png">');
+$('#forward').html('<img src="img/forward.png">');	
 	//click listener for buttons
      $('.skip').click(function(){
 		//get the old index value
@@ -160,6 +245,7 @@ function createSequenceControls(map, attributes){
 
 		//pass new attribute to update symbols
 		updatePropSymbols(map, attributes[index]);
+		
 	});
 
 	//input listener for slider
@@ -169,59 +255,81 @@ function createSequenceControls(map, attributes){
 
 		//pass new attribute to update symbols
 		updatePropSymbols(map, attributes[index]);
+		
 	});
 	
 };
 
 //Resize proportional symbols according to new attribute values
 function updatePropSymbols(map, attribute){
+	var props;
+	var currentLayer;
 	map.eachLayer(function(layer){
+		currentLayer = layer;
+		// each proportional symbol is a layer, including basemap.
 		if (layer.feature && layer.feature.properties[attribute]){
+			
 			//access feature properties
-			var props = layer.feature.properties;
+			props = layer.feature.properties;
 			
 			//update each feature's radius based on new attribute values
 			var	radius = calcPropRadius(props[attribute]);
 			layer.setRadius(radius);
 
-			createPopup(props, attribute, layer, radius);
+			updatePanel(props, attribute, layer);
+						
 		};
 	});
-
+	updateLegend(map, attribute);
 };
 
-
-function createPopup(properties, attribute, layer, radius){
+function updateLegend(map, attribute){
+	//create content for legend
 	
-	//add city to popup content string
-	var popupContent = "<p><b>City:</b> " + properties.Location + "</p>";
+	var content = attribute;
 
-	//replace the layer popup
-	layer.bindPopup(popupContent, {
-		offset: new L.Point(0,-radius),
-		closeButton: false
-	});
-	
+	//replace legend content
+	$('#temporal-legend').html(content);
+
+	var circleValues = getCircleValues(map, attribute);
+
+	for (var key in circleValues){
+		//get the radius
+		var radius = calcPropRadius(circleValues[key]);
+
+		$('#'+key).attr({
+			cy: 250 - radius,
+			r: radius
+		});
+
+		$('#'+key+'-text').text(Math.round(circleValues[key]));
+	};
+};
+
+function updatePanel(properties, attribute, layer){
 	 //original popupContent changed to panelContent
-    var panelContent = "<p><b>Location:</b> " + properties.Location + "</p>";
-	//add formatted attribute to panel content string
-    var year = attribute.split("_")[1];
+	
+	
+    var panelContent = "<p><b>Location:</b><span class = 'LocationName'>" + properties.Location + "</span></p>";
 	// add extra information
-    panelContent += "<p><b>Time period: </b>" + attribute + "</p><p><b>Earthquake number: </b> " + properties[attribute] + "</p>";
+    panelContent += "<p><b>Time period: </b>" + attribute + "</p><p><b>Number of earthquakes: </b> " + properties[attribute] + "</p>";
+	
+	if (properties.Location == $(".LocationName").html())
+	{
+	$("#paneltext").html(panelContent);	
+	
+	};
 	
 	layer.on({
-        mouseover: function(){
-            this.openPopup();
-        },
-        mouseout: function(){
-            this.closePopup();
-        },
-		 click: function(){
+        click: function(){
+			
             $("#paneltext").html(panelContent);
+			
         }
     });
 	
 };
+
 
 
 
@@ -241,9 +349,6 @@ function processData(data){
         };
     };
 
-    //check result
-    console.log(attributes);
-
     return attributes;
 };
 
@@ -258,9 +363,55 @@ function getData(map){
 
             createPropSymbols(response, map, attributes);
             createSequenceControls(map, attributes);
+			createLegend(map, attributes);
 									
         }
     });
 };
-
 getData(map);
+
+
+function getOverlaydata(map){
+    //load the data
+$.ajax("data/overlaydata.geojson", {
+        dataType: "json",
+        success: function(response){
+            createOverlaydata(response);			
+        }
+    });
+
+
+};
+
+
+function createOverlaydata(data){
+	
+var Options = {
+        radius: 1.5,
+        fillColor: "rgb(90, 0, 0)",
+        color: "rgb(90, 0, 0)",
+        opacity: 1,
+        fillOpacity: 0.9,
+    };
+var locations = L.geoJson(data, {
+        pointToLayer: function (feature, latlng) {
+                       
+	    //create circle marker layer
+           var overlayerr = L.circleMarker(latlng, Options);
+           
+		 return overlayerr;
+		}
+});
+
+
+var baseMaps = {
+	"Blackmap": black,
+    "Terrainmap": terrain
+};
+
+var overlayMaps = {
+    "Individual earthquake": locations
+};
+
+L.control.layers(baseMaps,overlayMaps).addTo(map);
+};

@@ -1,22 +1,8 @@
 /*Part1 Example from Leaflet Quick Start Guide*/
 //  initialize the map and set its view to our chosen geographical coordinates and a zoom level
-<<<<<<< HEAD
 
 
 
-=======
-var map = L.map('map').setView([51.505, 20], 3);
-// add base map with tile layers from website
-L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-	subdomains: 'abcd', // I chose one of stamen design style
-	minZoom: 0,
-	maxZoom: 20, // set minimum and maximum scale zooms
-	ext: 'png'
-}).addTo(map);
-
-
->>>>>>> origin/master
 // add a marker to a certain location
 var marker = L.marker([51.5, -0.09]).addTo(map);
 

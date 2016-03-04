@@ -1,31 +1,71 @@
-#map {
-    height: 1000px;
-    width: 1000px;
-    display: inline-block;
+body
+{
+	 background-image: url('../img/bg.png'); 
+
 }
 
-#panel {
-    width: 26%;
-    padding: 20px;
+#map {
+    height: 820px;
+    width: 65%;
     display: inline-block;
-    vertical-align: top;
-    text-align: center;
-    line-height: 10px;
 }
+.legend-control-container
+{background-color: #272727;
+opacity:0.8;
+font-family:Georgia;
+font-size:15px;
+}
+#text
+{color:white;}
+
+#heading1
+{font-family: Colonna MT;
+font-weight: 599;
+font-size: 4em;
+letter-spacing: 3px;
+color:red;
+background-color: #272727;
+margin-top: -5px;
+font-weight:5px
+}
+
+#heading2
+{font-family: Garamond;
+font-size: 1.75em;
+color: gray;
+background-color: #272727;
+margin-bottom:5px;
+}
+
 
 .range-slider {
     width: 50%;
+	
 }
+
+
+#temporal-legend
+{color:gray;
+text-align: center;}
 
 #forward {
     float: right;
+	
 	
 }
 
 #reverse {
     float: left;
+	
+}
+#paneltext
+{margin:10px;
+font-family:Georgia;
+color:gray;
+display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    line-height: 20px;
 }
 
-.leaflet-popup-content p {
-    margin: 0.2em 0;
-}
+
