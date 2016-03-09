@@ -18,7 +18,7 @@ terrain = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.
 getOverlaydata(map);
 
 var map = L.map('map', {
-    center: [25, 195],
+    center: [23, 195],
     zoom: 3,
     layers: [black]
 });
@@ -26,7 +26,7 @@ var map = L.map('map', {
 
 function calcPropRadius(attValue) {
     //scale factor to adjust symbol size evenly
-    var scaleFactor = 40;
+    var scaleFactor = 30;
     //area based on attribute value and scale factor
     var area = attValue * scaleFactor;
     //radius calculated based on area
@@ -41,11 +41,10 @@ function createPropSymbols(data,map,attributes){
     var attribute = attributes[0];
 	//create marker options
 	
-    var Options = {
-     
+    var Options = {     
         fillColor: "red",
         color: "red",
-        fillOpacity: 0.9,
+        fillOpacity: 0.85,
     };
 	
 
@@ -149,22 +148,22 @@ function createLegend(map, attributes){
 			$(container).append('<div id="temporal-legend">')
 
 			//start attribute legend svg string
-			var svg = '<svg id="attribute-legend" width="300px" height="260px">';
+			var svg = '<svg id="attribute-legend" width="280px" height="210px">';
 
 			//array to base loop on
 			var circles = {
 				max: 60,
 				mean: 140,
-				min: 220
+				min: 210
 			};
 
 			//loop to add each circle and text to svg string
 			for (var circle in circles){
 				//circle string
-				svg += '<circle class="legend-circle" id="' + circle + '" fill="red" fill-opacity="0.3"  cx="180"/>';
+				svg += '<circle class="legend-circle" id="' + circle + '" fill="red" fill-opacity="0.35"  cx="160"/>';
 
 				//text string
-				svg += '<text id="' + circle + '-text" x="20" y="' + circles[circle] + '"></text>';
+				svg += '<text class="legend-text" id="' + circle + '-text" x="20" y="' + circles[circle] + '"></text>';
 			};
 
 			//close svg string
@@ -286,7 +285,7 @@ function updatePropSymbols(map, attribute){
 function updateLegend(map, attribute){
 	//create content for legend
 	
-	var content = attribute;
+	var content = "<p>Earthquakes within 500km of major cities</p> "+ attribute;
 
 	//replace legend content
 	$('#temporal-legend').html(content);
@@ -298,7 +297,7 @@ function updateLegend(map, attribute){
 		var radius = calcPropRadius(circleValues[key]);
 
 		$('#'+key).attr({
-			cy: 250 - radius,
+			cy: 210 - radius,
 			r: radius
 		});
 
@@ -388,8 +387,8 @@ function createOverlaydata(data){
 	
 var Options = {
         radius: 1.5,
-        fillColor: "rgb(90, 0, 0)",
-        color: "rgb(90, 0, 0)",
+        fillColor: "#b52600",
+        color: "#b52600",
         opacity: 1,
         fillOpacity: 0.9,
     };
@@ -405,13 +404,197 @@ var locations = L.geoJson(data, {
 
 
 var baseMaps = {
-	"Blackmap": black,
-    "Terrainmap": terrain
+	"Basemap": black,
+    "Terrain": terrain
 };
 
+var mid = L.polyline([
+    [11, 271],
+	[17, 256],
+    [21, 250.5]],
+	{color: 'red'},
+    {weight:'7px'}
+ );
+mid.bindPopup("Middle America Trench");
+mid.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+ 
+});
+mid.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});
+
+ var aleu = L.polyline([
+    [58, 209],
+	[55, 201],
+    [51, 188],
+	[51, 176],
+	[54, 163]],
+    {color: 'red'},
+    {weight:'7px'}
+	);
+aleu.bindPopup("Aleutian Trench");
+aleu.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+ 
+});
+aleu.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});
+	
+ var kur = L.polyline([
+    [54, 162],
+	[49, 155],
+    [44, 149]
+ ],	{color: 'red'},
+    {weight:'7px'}); 
+kur.bindPopup("Kurile Trench");
+kur.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+ 
+});
+kur.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});
+	
+ var jap = L.polyline([
+    [44, 148],
+	[40, 142],
+    [35, 141]
+ ],	{color: 'red'},
+    {weight:'7px'}); 
+jap.bindPopup("Japan Trench");
+jap.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+});
+jap.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});	
+ 
+ var izu = L.polyline([
+    [33, 139],
+	[26, 141],
+    [20, 143],
+	[15, 145]
+ ],	{color: 'red'},
+    {weight:'7px'});
+izu.bindPopup("Izu Ogasawara Trench");
+izu.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+ 
+});
+izu.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});	
+ 
+ var phi = L.polyline([
+    [18, 123],
+	[14, 123],
+    [9, 127],
+	[3, 129]
+ ],	{color: 'red'},
+    {weight:'7px'});  
+phi.bindPopup("Philippine Trench");
+phi.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+ 
+});
+phi.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});		
+ 
+ var ryu = L.polyline([
+    [32, 133],
+	[28, 129],
+    [25, 127],
+	[24, 124]
+ ],	{color: 'red'},
+    {weight:'7px'}); 
+ryu.bindPopup("Ryukyu Trench");
+ryu.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+});
+ryu.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});	
+	
+ var mar = L.polyline([
+    [12, 144],
+	[7, 140],
+    [3, 134],
+	[1, 130]
+ ],	{color: 'red'},
+    {weight:'7px'}); 
+mar.bindPopup("Marianas Trench");
+mar.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+});
+mar.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});		
+ 
+ var bou = L.polyline([
+    [0.5, 137],
+	[-1, 149],
+    [-5, 159],
+	[-11, 169],
+	[-16, 177],
+ ],	{color: 'red'},
+    {weight:'7px'});
+bou.bindPopup("Bougainville Trench");
+bou.on('mouseover', function () {
+this.openPopup();
+this.setStyle({color: "gray"});
+this.setStyle({weight: 15});
+});
+bou.on('mouseout', function () {
+  this.closePopup();
+  this.setStyle({color: "red"});
+  this.setStyle({weight: 7});
+});	
+
+var trenches = L.layerGroup([mid, bou, mar, ryu,phi,izu,jap,kur,aleu]);
+ 
 var overlayMaps = {
-    "Individual earthquake": locations
+    "Individual Earthquake": locations,
+	"Oceanic Trenches": trenches
 };
 
 L.control.layers(baseMaps,overlayMaps).addTo(map);
 };
+
+
+
+	
